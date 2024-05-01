@@ -1,0 +1,40 @@
+@startuml
+autonumber
+participant 클라이언트
+
+activate 클라이언트
+클라이언트 -> 예약MS: 결제 대기 상태 예약 생성
+    activate 예약MS
+    예약MS --> 클라이언트
+    deactivate 예약MS
+클라이언트 -> 결제대행사: 결제
+    activate 결제대행사
+    결제대행사 --> 클라이언트
+    deactivate 결제대행사
+
+클라이언트 -> 예약MS: 결제 완료 요청
+    activate 예약MS
+    예약MS -> 예약MS: 결제 컨펌 대기 상태로 변경
+        activate 예약MS
+        deactivate 예약MS
+    예약MS -> 결제MS: 결제 컨펌 대기 이벤트
+        activate 결제MS
+    예약MS --> 클라이언트: 결제 컨펌 대기 상태 응답
+    deactivate 예약MS
+    결제MS -> 결제대행사: 결제 내역 조회
+        activate 결제대행사
+        결제대행사 --> 결제MS: 확인
+        deactivate 결제대행사
+    결제MS -> 예약MS: 결제 컨펌 완료 이벤트
+    deactivate 결제MS
+        activate 예약MS
+        예약MS -> 예약MS: 결제 완료 상태로 변경
+            activate 예약MS
+            deactivate 예약MS
+        deactivate 예약MS
+클라이언트 -> 예약MS: 결제 완료 요청
+    activate 예약MS
+    예약MS --> 클라이언트: 결제 완료 상태 응답
+    deactivate 예약MS
+deactivate 클라이언트
+@enduml

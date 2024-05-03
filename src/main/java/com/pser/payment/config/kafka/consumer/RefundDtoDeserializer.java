@@ -1,4 +1,4 @@
-package com.pser.payment.consumer;
+package com.pser.payment.config.kafka.consumer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pser.payment.dto.RefundDto;

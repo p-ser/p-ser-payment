@@ -1,12 +1,12 @@
-package com.pser.payment.producer;
+package com.pser.payment.config.kafka.producer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.pser.payment.dto.PaymentDto;
+import com.pser.payment.dto.RefundDto;
 import java.util.Map;
 import org.apache.kafka.common.errors.SerializationException;
 import org.apache.kafka.common.serialization.Serializer;
 
-public class PaymentDtoSerializer implements Serializer<PaymentDto> {
+public class RefundDtoSerializer implements Serializer<RefundDto> {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
@@ -14,7 +14,7 @@ public class PaymentDtoSerializer implements Serializer<PaymentDto> {
     }
 
     @Override
-    public byte[] serialize(String topic, PaymentDto data) {
+    public byte[] serialize(String topic, RefundDto data) {
         try {
             if (data == null) {
                 return null;

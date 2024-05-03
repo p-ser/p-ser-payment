@@ -28,6 +28,9 @@ activate 클라이언트
     결제MS -> 예약MS: 결제 컨펌 완료 이벤트
     deactivate 결제MS
         activate 예약MS
+        예약MS -> 예약MS: 결제 내역 일치 검증
+            activate 예약MS
+            deactivate 예약MS
         예약MS -> 예약MS: 결제 완료 상태로 변경
             activate 예약MS
             deactivate 예약MS

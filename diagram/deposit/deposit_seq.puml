@@ -28,6 +28,9 @@ activate 클라이언트
     결제MS -> 경매MS: 결제 컨펌 완료 이벤트
     deactivate 결제MS
         activate 경매MS
+        경매MS -> 경매MS: 결제 내역 일치 검증
+            activate 경매MS
+            deactivate 경매MS
         경매MS -> 경매MS: 결제 완료 상태로 변경
             activate 경매MS
             deactivate 경매MS

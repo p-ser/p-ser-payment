@@ -6,7 +6,10 @@ import com.pser.payment.dto.ConfirmDto;
 import com.pser.payment.dto.RefundDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.kafka.annotation.DltHandler;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.support.KafkaHeaders;
+import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.stereotype.Component;
 
 @Slf4j
@@ -35,13 +38,4 @@ public class PaymentConsumer {
         paymentService.refund(ServiceEnum.RESERVATION, refundDto);
     }
 
-    @KafkaListener(topics = "deposit-confirmed-rollback", groupId = "${kafka.consumer-group-id}", containerFactory = "stringValueListenerContainerFactory")
-    public void rollbackConfirmedDeposit(RefundDto refundDto) {
-        paymentService.refund(ServiceEnum.DEPOSIT, refundDto);
-    }
-
-    @KafkaListener(topics = "reservation-confirmed-rollback", groupId = "${kafka.consumer-group-id}", containerFactory = "stringValueListenerContainerFactory")
-    public void rollbackConfirmedReservation(RefundDto refundDto) {
-        paymentService.refund(ServiceEnum.RESERVATION, refundDto);
-    }
 }

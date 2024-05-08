@@ -12,7 +12,7 @@ public class ConfirmedProducer {
     private final KafkaTemplate<String, PaymentDto> paymentDtoValueKafkaTemplate;
 
     public void notifyConfirmed(ServiceEnum serviceEnum, PaymentDto paymentDto) {
-        String topic = serviceEnum.getTopicPrefix() + "-confirmed";
+        String topic = serviceEnum.getTopicPrefix() + ".confirmed";
         paymentDtoValueKafkaTemplate.send(topic, paymentDto);
     }
 }

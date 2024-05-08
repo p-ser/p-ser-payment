@@ -12,7 +12,7 @@ public class RefundedProducer {
     private final KafkaTemplate<String, PaymentDto> paymentDtoValueKafkaTemplate;
 
     public void notifyRefunded(ServiceEnum serviceEnum, PaymentDto paymentDto) {
-        String topic = serviceEnum.getTopicPrefix() + "-refunded";
+        String topic = serviceEnum.getTopicPrefix() + ".refunded";
         paymentDtoValueKafkaTemplate.send(topic, paymentDto);
     }
 }

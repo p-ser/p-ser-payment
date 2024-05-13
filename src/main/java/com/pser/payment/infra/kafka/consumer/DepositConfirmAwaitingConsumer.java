@@ -1,4 +1,4 @@
-package com.pser.payment.consumer;
+package com.pser.payment.infra.kafka.consumer;
 
 import com.pser.payment.application.PaymentService;
 import com.pser.payment.config.kafka.KafkaTopics;

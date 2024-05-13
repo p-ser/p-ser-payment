@@ -1,4 +1,4 @@
-package com.pser.payment.producer;
+package com.pser.payment.infra.kafka.producer;
 
 import com.pser.payment.domain.ServiceEnum;
 import com.pser.payment.dto.PaymentDto;

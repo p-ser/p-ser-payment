@@ -1,9 +1,11 @@
 package com.pser.payment.infra;
 
 import com.pser.payment.dto.PaymentDto;
+import com.pser.payment.dto.PortoneResponse;
 import com.pser.payment.dto.RefundDto;
 import io.vavr.control.Try;
 import java.util.Map;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.env.Environment;
@@ -45,8 +47,10 @@ public class PortoneClient {
                 .get("%s/%s".formatted(url, impUid))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer %s".formatted(token))
                 .build();
-        ResponseEntity<PaymentDto> responseEntity = restTemplate.exchange(requestEntity, PaymentDto.class);
-        return responseEntity.getBody();
+        ResponseEntity<PortoneResponse> responseEntity = restTemplate.exchange(requestEntity, PortoneResponse.class);
+        return Optional.ofNullable(responseEntity.getBody())
+                .orElseThrow()
+                .getResponse();
     }
 
     private PaymentDto refund(RefundDto refundDto) {
@@ -55,8 +59,10 @@ public class PortoneClient {
                 .post(url)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer %s".formatted(token))
                 .body(refundDto);
-        ResponseEntity<PaymentDto> responseEntity = restTemplate.exchange(requestEntity, PaymentDto.class);
-        return responseEntity.getBody();
+        ResponseEntity<PortoneResponse> responseEntity = restTemplate.exchange(requestEntity, PortoneResponse.class);
+        return Optional.ofNullable(responseEntity.getBody())
+                .orElseThrow()
+                .getResponse();
     }
 
     private String refreshToken() {

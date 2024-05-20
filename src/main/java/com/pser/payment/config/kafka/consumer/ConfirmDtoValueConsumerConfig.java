@@ -1,7 +1,6 @@
 package com.pser.payment.config.kafka.consumer;
 
 import com.pser.payment.dto.ConfirmDto;
-import com.pser.payment.dto.PaymentDto;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;

@@ -26,7 +26,7 @@ public class PaymentService {
 
         portoneClient.tryGetByImpUid(impUid)
                 .map(paymentDto -> {
-                    String status = paymentDto.getResponse().getStatus();
+                    String status = paymentDto.getStatus();
                     if (status == null || !status.equals("paid")) {
                         throw new ValidationFailedException();
                     }

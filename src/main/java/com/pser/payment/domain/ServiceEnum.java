@@ -5,7 +5,8 @@ import lombok.Getter;
 @Getter
 public enum ServiceEnum {
     RESERVATION("reservation"),
-    DEPOSIT("deposit");
+    DEPOSIT("deposit"),
+    AUCTION("auction");
 
     private final String topicPrefix;
 

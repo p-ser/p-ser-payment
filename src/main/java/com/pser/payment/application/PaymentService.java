@@ -56,7 +56,7 @@ public class PaymentService {
                 .get();
     }
 
-    public void rollbackToPaymentValidationRequired(ServiceEnum serviceEnum, String merchantUid) {
+    public void rollbackToPaymentRequired(ServiceEnum serviceEnum, String merchantUid) {
         paymentValidationRequiredRollbackProducer.notifyRollback(serviceEnum, merchantUid);
     }
 }

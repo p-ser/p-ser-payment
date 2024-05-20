@@ -27,6 +27,6 @@ public class DepositPaymentValidationRequiredConsumer {
     @DltHandler
     public void dltHandler(ConsumerRecord<String, PaymentDto> record) {
         PaymentDto paymentDto = record.value();
-        paymentService.rollbackToPaymentValidationRequired(ServiceEnum.DEPOSIT, paymentDto.getMerchantUid());
+        paymentService.rollbackToPaymentRequired(ServiceEnum.DEPOSIT, paymentDto.getMerchantUid());
     }
 }

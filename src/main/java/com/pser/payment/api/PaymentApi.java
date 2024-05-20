@@ -3,7 +3,7 @@ package com.pser.payment.api;
 import com.pser.payment.application.PaymentService;
 import com.pser.payment.common.response.ApiResponse;
 import com.pser.payment.domain.ServiceEnum;
-import com.pser.payment.dto.ConfirmDto;
+import com.pser.payment.dto.PaymentDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -19,9 +19,9 @@ public class PaymentApi {
     private final PaymentService paymentService;
 
     @PostMapping("/webhooks/{webhookType}")
-    public ResponseEntity<ApiResponse<Void>> post(@PathVariable ServiceEnum webhookType,
-                                                  @RequestBody ConfirmDto request) {
-        paymentService.confirm(webhookType, request);
+    public ResponseEntity<ApiResponse<Void>> validatePayment(@PathVariable ServiceEnum webhookType,
+                                                             @RequestBody PaymentDto request) {
+        paymentService.validatePayment(webhookType, request);
         return ResponseEntity.noContent().build();
     }
 }

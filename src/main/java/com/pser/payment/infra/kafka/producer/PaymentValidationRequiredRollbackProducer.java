@@ -7,11 +7,11 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class ConfirmAwaitingRollbackProducer {
+public class PaymentValidationRequiredRollbackProducer {
     private final KafkaTemplate<String, String> stringValueKafkaTemplate;
 
     public void notifyRollback(ServiceEnum serviceEnum, String merchantUid) {
-        String topic = serviceEnum.getTopicPrefix() + ".confirm-awaiting-rollback";
+        String topic = serviceEnum.getTopicPrefix() + ".payment-validation-required-rollback";
         stringValueKafkaTemplate.send(topic, merchantUid);
     }
 }

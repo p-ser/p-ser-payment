@@ -8,11 +8,11 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class ConfirmedProducer {
+public class PaymentValidationCheckedProducer {
     private final KafkaTemplate<String, PaymentDto> paymentDtoValueKafkaTemplate;
 
-    public void notifyConfirmed(ServiceEnum serviceEnum, PaymentDto paymentDto) {
-        String topic = serviceEnum.getTopicPrefix() + ".confirmed";
+    public void notifyPaymentValidationChecked(ServiceEnum serviceEnum, PaymentDto paymentDto) {
+        String topic = serviceEnum.getTopicPrefix() + ".payment-validation-checked";
         paymentDtoValueKafkaTemplate.send(topic, paymentDto);
     }
 }

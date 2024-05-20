@@ -8,11 +8,11 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class RefundedProducer {
+public class RefundCheckedProducer {
     private final KafkaTemplate<String, PaymentDto> paymentDtoValueKafkaTemplate;
 
-    public void notifyRefunded(ServiceEnum serviceEnum, PaymentDto paymentDto) {
-        String topic = serviceEnum.getTopicPrefix() + ".refunded";
+    public void notifyRefundChecked(ServiceEnum serviceEnum, PaymentDto paymentDto) {
+        String topic = serviceEnum.getTopicPrefix() + ".refund-checked";
         paymentDtoValueKafkaTemplate.send(topic, paymentDto);
     }
 }

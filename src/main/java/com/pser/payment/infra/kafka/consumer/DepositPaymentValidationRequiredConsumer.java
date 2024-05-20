@@ -3,7 +3,7 @@ package com.pser.payment.infra.kafka.consumer;
 import com.pser.payment.application.PaymentService;
 import com.pser.payment.config.kafka.KafkaTopics;
 import com.pser.payment.domain.ServiceEnum;
-import com.pser.payment.dto.ConfirmDto;
+import com.pser.payment.dto.PaymentDto;
 import com.pser.payment.dto.RefundDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,21 +16,21 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class DepositConfirmAwaitingConsumer {
+public class DepositPaymentValidationRequiredConsumer {
     private final PaymentService paymentService;
 
-    @RetryableTopic(kafkaTemplate = "confirmDtoValueKafkaTemplate", attempts = "5")
-    @KafkaListener(topics = KafkaTopics.DEPOSIT_CONFIRM_AWAITING, groupId = "${kafka.consumer-group-id}", containerFactory = "confirmDtoValueListenerContainerFactory")
-    public void confirmDeposit(ConfirmDto confirmDto) {
-        paymentService.confirm(ServiceEnum.DEPOSIT, confirmDto);
+    @RetryableTopic(kafkaTemplate = "paymentDtoValueKafkaTemplate", attempts = "5")
+    @KafkaListener(topics = KafkaTopics.DEPOSIT_PAYMENT_VALIDATION_REQUIRED, groupId = "${kafka.consumer-group-id}", containerFactory = "paymentDtoValueListenerContainerFactory")
+    public void validateDepositPayment(PaymentDto paymentDto) {
+        paymentService.validatePayment(ServiceEnum.DEPOSIT, paymentDto);
     }
 
     @DltHandler
-    public void dltHandler(ConsumerRecord<String, ConfirmDto> record) {
-        ConfirmDto confirmDto = record.value();
+    public void dltHandler(ConsumerRecord<String, PaymentDto> record) {
+        PaymentDto paymentDto = record.value();
         RefundDto refundDto = RefundDto.builder()
-                .impUid(confirmDto.getImpUid())
-                .merchantUid(confirmDto.getMerchantUid())
+                .impUid(paymentDto.getImpUid())
+                .merchantUid(paymentDto.getMerchantUid())
                 .build();
         paymentService.refund(ServiceEnum.DEPOSIT, refundDto);
     }

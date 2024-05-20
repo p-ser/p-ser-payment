@@ -13,12 +13,12 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class DepositRefundAwaitingConsumer {
+public class ReservationRefundRequiredConsumer {
     private final PaymentService paymentService;
 
     @RetryableTopic(kafkaTemplate = "refundDtoValueKafkaTemplate", attempts = "5")
-    @KafkaListener(topics = KafkaTopics.DEPOSIT_REFUND_AWAITING, groupId = "${kafka.consumer-group-id}", containerFactory = "refundDtoValueListenerContainerFactory")
-    public void refundDeposit(RefundDto refundDto) {
-        paymentService.refund(ServiceEnum.DEPOSIT, refundDto);
+    @KafkaListener(topics = KafkaTopics.RESERVATION_REFUND_REQUIRED, groupId = "${kafka.consumer-group-id}", containerFactory = "refundDtoValueListenerContainerFactory")
+    public void refundReservation(RefundDto refundDto) {
+        paymentService.refund(ServiceEnum.RESERVATION, refundDto);
     }
 }

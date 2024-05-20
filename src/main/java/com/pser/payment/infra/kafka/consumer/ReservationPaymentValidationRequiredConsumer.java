@@ -28,10 +28,6 @@ public class ReservationPaymentValidationRequiredConsumer {
     @DltHandler
     public void dltHandler(ConsumerRecord<String, PaymentDto> record) {
         PaymentDto paymentDto = record.value();
-        RefundDto refundDto = RefundDto.builder()
-                .impUid(paymentDto.getImpUid())
-                .merchantUid(paymentDto.getMerchantUid())
-                .build();
-        paymentService.refund(ServiceEnum.RESERVATION, refundDto);
+        paymentService.rollbackToPaymentValidationRequired(ServiceEnum.RESERVATION, paymentDto.getMerchantUid());
     }
 }

@@ -4,7 +4,6 @@ import com.pser.payment.application.PaymentService;
 import com.pser.payment.config.kafka.KafkaTopics;
 import com.pser.payment.domain.ServiceEnum;
 import com.pser.payment.dto.PaymentDto;
-import com.pser.payment.dto.RefundDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -28,10 +27,6 @@ public class DepositPaymentValidationRequiredConsumer {
     @DltHandler
     public void dltHandler(ConsumerRecord<String, PaymentDto> record) {
         PaymentDto paymentDto = record.value();
-        RefundDto refundDto = RefundDto.builder()
-                .impUid(paymentDto.getImpUid())
-                .merchantUid(paymentDto.getMerchantUid())
-                .build();
-        paymentService.refund(ServiceEnum.DEPOSIT, refundDto);
+        paymentService.rollbackToPaymentValidationRequired(ServiceEnum.DEPOSIT, paymentDto.getMerchantUid());
     }
 }

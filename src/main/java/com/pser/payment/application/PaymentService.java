@@ -5,9 +5,10 @@ import com.pser.payment.dto.PaymentDto;
 import com.pser.payment.dto.RefundDto;
 import com.pser.payment.exception.ValidationFailedException;
 import com.pser.payment.infra.PortoneClient;
-import com.pser.payment.infra.kafka.producer.PaymentValidationRequiredRollbackProducer;
 import com.pser.payment.infra.kafka.producer.PaymentValidationCheckedProducer;
+import com.pser.payment.infra.kafka.producer.PaymentValidationRequiredRollbackProducer;
 import com.pser.payment.infra.kafka.producer.RefundCheckedProducer;
+import io.vavr.control.Try;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -24,7 +25,12 @@ public class PaymentService {
     public void validatePayment(ServiceEnum serviceEnum, PaymentDto paymentDto) {
         String impUid = paymentDto.getImpUid();
 
-        portoneClient.tryGetByImpUid(impUid)
+        Try<PaymentDto> paymentDtoTry = portoneClient.tryGetByImpUid(impUid);
+        if (paymentDtoTry.isFailure()) {
+            throw new UnknownError();
+        }
+
+        paymentDtoTry
                 .map(dto -> {
                     String status = dto.getStatus();
                     if (status == null || !status.equals("paid")) {
@@ -34,7 +40,11 @@ public class PaymentService {
                 })
                 .onSuccess((dto) -> paymentValidationCheckedProducer.notifyPaymentValidationChecked(serviceEnum, dto))
                 .recover(ValidationFailedException.class, e -> {
-                    paymentValidationRequiredRollbackProducer.notifyRollback(serviceEnum, paymentDto.getMerchantUid());
+                    RefundDto refundDto = RefundDto.builder()
+                            .impUid(paymentDto.getImpUid())
+                            .merchantUid(paymentDto.getMerchantUid())
+                            .build();
+                    refund(serviceEnum, refundDto);
                     return null;
                 })
                 .get();
@@ -44,5 +54,9 @@ public class PaymentService {
         portoneClient.tryRefund(refundDto)
                 .onSuccess(paymentDto -> refundCheckedProducer.notifyRefundChecked(serviceEnum, paymentDto))
                 .get();
+    }
+
+    public void rollbackToPaymentValidationRequired(ServiceEnum serviceEnum, String merchantUid) {
+        paymentValidationRequiredRollbackProducer.notifyRollback(serviceEnum, merchantUid);
     }
 }

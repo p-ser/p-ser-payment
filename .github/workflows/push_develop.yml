@@ -18,7 +18,7 @@ jobs:
           distribution: 'adopt'
       - name: Add config yaml
         run: |
-          mkdir ./src/main/resources; touch ./src/main/resources/application.yaml
+          mkdir -p ./src/main/resources; touch ./src/main/resources/application.yaml
           echo "${{secrets.TEST_CONFIG}}" > ./src/main/resources/application.yaml
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew

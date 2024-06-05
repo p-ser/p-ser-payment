@@ -11,8 +11,8 @@ import lombok.Setter;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class PortoneResponse {
+public class PortoneResponse<T> {
     private int code;
     private String message;
-    private PaymentDto response;
+    private T response;
 }

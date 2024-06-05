@@ -1,13 +1,17 @@
 package com.pser.payment.infra;
 
+import com.fasterxml.jackson.annotation.JsonAlias;
+import com.fasterxml.jackson.annotation.JsonGetter;
 import com.pser.payment.dto.PaymentDto;
 import com.pser.payment.dto.PortoneResponse;
 import com.pser.payment.dto.RefundDto;
 import io.vavr.control.Try;
-import java.util.Map;
 import java.util.Optional;
+import lombok.Builder;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.RequestEntity;
@@ -47,7 +51,9 @@ public class PortoneClient {
                 .get("%s/%s".formatted(url, impUid))
                 .header(HttpHeaders.AUTHORIZATION, "Bearer %s".formatted(token))
                 .build();
-        ResponseEntity<PortoneResponse> responseEntity = restTemplate.exchange(requestEntity, PortoneResponse.class);
+        ResponseEntity<PortoneResponse<PaymentDto>> responseEntity = restTemplate.exchange(requestEntity,
+                new ParameterizedTypeReference<>() {
+                });
         return Optional.ofNullable(responseEntity.getBody())
                 .orElseThrow()
                 .getResponse();
@@ -59,28 +65,76 @@ public class PortoneClient {
                 .post(url)
                 .header(HttpHeaders.AUTHORIZATION, "Bearer %s".formatted(token))
                 .body(refundDto);
-        ResponseEntity<PortoneResponse> responseEntity = restTemplate.exchange(requestEntity, PortoneResponse.class);
+        ResponseEntity<PortoneResponse<PaymentDto>> responseEntity = restTemplate.exchange(requestEntity,
+                new ParameterizedTypeReference<>() {
+                });
         return Optional.ofNullable(responseEntity.getBody())
-                .orElseThrow()
-                .getResponse();
+                .map(PortoneResponse::getResponse)
+                .orElse(
+                        PaymentDto.builder()
+                                .impUid(refundDto.getImpUid())
+                                .merchantUid(refundDto.getMerchantUid())
+                                .build()
+                );
     }
 
-    private String refreshToken() {
+    private void refreshToken() {
         String url = env.getProperty("portone.token-url", "");
-        Map<String, String> requestBody = Map.of(
-                "imp_key", env.getProperty("portone.imp-key", ""),
-                "imp_secret", env.getProperty("portone.imp-secret", "")
-        );
-        Map<String, String> response = (Map) restTemplate.postForObject(url, requestBody, Map.class).get("response");
-        String token = response.get("access_token");
+        TokenRequest tokenRequest = TokenRequest.builder()
+                .impKey(env.getProperty("portone.imp-key"))
+                .impSecret(env.getProperty("portone.imp-secret"))
+                .build();
+        RequestEntity<TokenRequest> requestEntity = RequestEntity
+                .post(url)
+                .body(tokenRequest);
+
+        ParameterizedTypeReference<PortoneResponse<TokenResponse>> typeReference = new ParameterizedTypeReference<>() {
+        };
+        ResponseEntity<PortoneResponse<TokenResponse>> response = restTemplate.exchange(requestEntity, typeReference);
+
+        String token = Optional.ofNullable(response.getBody())
+                .map(PortoneResponse::getResponse)
+                .map(TokenResponse::getAccessToken)
+                .orElseThrow();
         if (token.equals(this.token)) {
-            return this.token;
+            return;
         }
         setToken(token);
-        return this.token;
     }
 
     private synchronized void setToken(String token) {
         this.token = token;
+    }
+
+    @Getter
+    @Builder
+    public static class TokenResponse {
+        @JsonAlias("access_token")
+        private String accessToken;
+
+        @JsonAlias("now")
+        private Integer now;
+
+        @JsonAlias("expired_at")
+        private Integer expiredAt;
+    }
+
+    @Builder
+    public static class TokenRequest {
+        @JsonAlias("imp_key")
+        private String impKey;
+
+        @JsonAlias("imp_secret")
+        private String impSecret;
+
+        @JsonGetter("imp_key")
+        public String getImpKey() {
+            return impKey;
+        }
+
+        @JsonGetter("imp_secret")
+        public String getImpSecret() {
+            return impSecret;
+        }
     }
 }

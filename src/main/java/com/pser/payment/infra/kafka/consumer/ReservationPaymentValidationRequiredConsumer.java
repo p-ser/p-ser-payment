@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 public class ReservationPaymentValidationRequiredConsumer {
     private final PaymentService paymentService;
 
-    @RetryableTopic(kafkaTemplate = "paymentDtoValueKafkaTemplate", attempts = "5")
+    @RetryableTopic(kafkaTemplate = "paymentDtoValueKafkaTemplate", attempts = "5", retryTopicSuffix = "-retry-${kafka.consumer-group-id}")
     @KafkaListener(topics = KafkaTopics.RESERVATION_PAYMENT_VALIDATION_REQUIRED, groupId = "${kafka.consumer-group-id}", containerFactory = "paymentDtoValueListenerContainerFactory")
     public void validateReservationPayment(PaymentDto paymentDto) {
         paymentService.validatePayment(ServiceEnum.RESERVATION, paymentDto);
